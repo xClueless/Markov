@@ -15,19 +15,25 @@ enum markov_db_err
     INVALID_HEADER = 1
 };
 
-class MARKOVSHARED_EXPORT Markov : public QObject
+class MARKOVSHARED_EXPORT MarkovChain : public QObject
 {
 private:
     Q_OBJECT
+    QString mDBPath;
     QFile dbFile;
     MarkovHeader mHeader;
     QList<MarkovNode> mNodes;
-
-    bool loadTree();
 public:
-    Markov(QString dbPath);
+    explicit MarkovChain(QString dbPath, QObject* parent=0);
+    virtual ~MarkovChain();
+    MarkovNode& operator[](const QString& nodeStr);
+    MarkovNode& node(const QString& nodeStr);
 public slots:
     void read(const QJsonObject& json);
+    void write(QJsonObject& json) const;
+    void initDB();
+    bool loadDB();
+    bool writeDB();
 };
 
 #endif // MARKOV_HPP

@@ -13,16 +13,16 @@ CONFIG += c++11
 
 DEFINES += MARKOV_LIBRARY
 
-SOURCES += Markov.cpp \
-           MarkovNode.cpp \
+SOURCES += MarkovNode.cpp \
            MarkovLink.cpp \
-           MarkovHeader.cpp
+           MarkovHeader.cpp \
+           MarkovChain.cpp
 
-HEADERS += Markov.hpp\
-           markov_global.hpp \
+HEADERS += markov_global.hpp \
            MarkovNode.hpp \
            MarkovLink.hpp \
-           MarkovHeader.hpp
+           MarkovHeader.hpp \
+           MarkovChain.hpp
 
 unix {
     target.path = /usr/lib
