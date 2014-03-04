@@ -6,7 +6,7 @@
 
 QT       -= gui
 
-TARGET = Markov
+TARGET = qmarkov
 TEMPLATE = lib
 
 CONFIG += c++11
@@ -25,6 +25,8 @@ HEADERS += markov_global.hpp \
            MarkovChain.hpp
 
 unix {
-    target.path = /usr/lib
-    INSTALLS += target
+    target.path = /usr/local/lib
+    headers.files += $$HEADERS
+    headers.path = /usr/local/include/qmarkov
+    INSTALLS += target headers
 }

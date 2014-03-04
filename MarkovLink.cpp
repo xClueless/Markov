@@ -3,11 +3,11 @@
 MarkovLink::MarkovLink(){}
 MarkovLink::MarkovLink(QString word, int wordOccurances) : mWord(word), mOccurances(wordOccurances){}
 
-QString MarkovLink::word()
+QString MarkovLink::word() const
 {
     return mWord;
 }
-int MarkovLink::occurances()
+int MarkovLink::occurances() const
 {
     return mOccurances;
 }
@@ -26,7 +26,7 @@ MarkovLink& MarkovLink::operator++()
     mOccurances++;
     return *this;
 }
-bool MarkovLink::operator==(const QString& str)
+bool MarkovLink::operator==(const QString& str) const
 {
     return mWord == str;
 }

@@ -8,8 +8,8 @@ class MARKOVSHARED_EXPORT MarkovHeader
 {
 private:
     QString mFormatSignature;
-    int mWords;
-    int mContexts;
+    int mWords = 0;
+    int mContexts = 0;
 public:
     MarkovHeader();
     QString formatSignature() const;
@@ -17,6 +17,8 @@ public:
     int words() const;
     int contexts() const;
     void setFormatSignature(const QString& FormatSignature);
+    void setWords(int nWords);
+    void setContexts(int nContexts);
     void read(const QJsonObject& json);
     void write(QJsonObject& json) const;
 };

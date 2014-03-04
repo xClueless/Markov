@@ -20,6 +20,15 @@ void MarkovHeader::setFormatSignature(const QString& FormatSignature)
     this->formatSignature() = FormatSignature;
 }
 
+void MarkovHeader::setWords(int nWords)
+{
+    mWords = nWords;
+}
+void MarkovHeader::setContexts(int nContexts)
+{
+    mContexts = nContexts;
+}
+
 void MarkovHeader::read(const QJsonObject& json)
 {
     mFormatSignature = json["FormatSignature"].toString();

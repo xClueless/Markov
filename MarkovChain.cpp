@@ -3,39 +3,48 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QTextStream>
 
-MarkovChain::MarkovChain(QString dbPath, QObject* parent) : QObject(parent)
+MarkovChain::MarkovChain(QString dbPath, QObject* parent) : QObject(parent), mDBFile(dbPath)
 {
-
 }
 MarkovChain::~MarkovChain()
 {
-
 }
-
+void MarkovChain::clearNodes()
+{
+    for(int i=0;i<mNodes.count();++i)
+    {
+        mNodes.removeAt(i);
+    }
+}
 void MarkovChain::initDB()
 {
-
     mHeader.setFormatSignature("xclueless.MarkovChain:1");
 }
+void MarkovChain::deleteDB()
+{
+    mDBFile.remove();
+}
+
 
 bool MarkovChain::loadDB()
 {
-    if(!dbFile.open(QIODevice::ReadWrite))
+    if(!mDBFile.open(QIODevice::ReadWrite))
     {
         qWarning("Couldn't open DB.");
         return false;
     }
 
-    QJsonDocument db = QJsonDocument::fromJson(dbFile.readAll());
-    dbFile.close();
+    QJsonDocument db = QJsonDocument::fromJson(mDBFile.readAll());
+    mDBFile.close();
     read(db.object());
 
     return true;
 }
 bool MarkovChain::writeDB()
 {
-    if (!dbFile.open(QIODevice::WriteOnly)) {
+    if (!mDBFile.open(QIODevice::WriteOnly)) {
         qWarning("Couldn't open DB.");
         return false;
     }
@@ -43,8 +52,8 @@ bool MarkovChain::writeDB()
     QJsonObject chainObject;
     write(chainObject);
     QJsonDocument chainDoc(chainObject);
-    dbFile.write(chainDoc.toJson());
-    dbFile.close();
+    mDBFile.write(chainDoc.toJson());
+    mDBFile.close();
 
     return true;
 }
@@ -79,6 +88,14 @@ MarkovNode& MarkovChain::operator[](const QString& nodeStr)
 {
     return node(nodeStr);
 }
+MarkovHeader& MarkovChain::header()
+{
+    return mHeader;
+}
+const QList<MarkovNode> MarkovChain::nodes() const
+{
+    return mNodes;
+}
 MarkovNode& MarkovChain::node(const QString& nodeStr)
 {
     for(MarkovNode& node : mNodes)
@@ -89,5 +106,42 @@ MarkovNode& MarkovChain::node(const QString& nodeStr)
         }
     }
     mNodes.append(MarkovNode(nodeStr));
+    mHeader.setWords(mHeader.words()+1);
     return mNodes.last();
+}
+void MarkovChain::inputSentence(QString input)
+{
+    inputSentence(input.split(' '));
+}
+void MarkovChain::inputSentence(QStringList words)
+{
+    QString& prevWord = words[0];
+
+    for(int i=1;i<words.size();i++)
+    {
+        const QString& currentWord = words[i];
+        ++node(currentWord).link(prevWord);
+        prevWord = currentWord;
+    }
+}
+bool MarkovChain::inputLogFile(QString filePath)
+{
+//    qDebug() << "[MarkovChain] inputLogFile()";
+
+    QFile logFile(filePath);
+    if (logFile.open(QIODevice::ReadOnly))
+    {
+//       qDebug() << "[MarkovChain] Reading file: " << filePath;
+
+       QTextStream in(&logFile);
+       while (!in.atEnd() )
+       {
+          QString line = in.readLine();
+//          qDebug() << "ILF:" << line;
+          inputSentence(line);
+       }
+       logFile.close();
+       return true;
+    }
+    return false;
 }
